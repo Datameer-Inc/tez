@@ -25,12 +25,16 @@ import org.apache.hadoop.classification.InterfaceAudience.Private;
 import org.apache.hadoop.classification.InterfaceStability.Unstable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.security.SecurityUtil;
+import org.apache.hadoop.yarn.conf.HAUtil;
 import org.apache.hadoop.yarn.conf.YarnConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Private
 @Unstable
 public class Master {
 
+  private static final Logger LOG = LoggerFactory.getLogger(Master.class);
   public enum State {
     INITIALIZING, RUNNING;
   }
@@ -42,12 +46,30 @@ public class Master {
   
   // This needs to go into YARN
   public static InetSocketAddress getMasterAddress(Configuration conf) {
-    return conf
-        .getSocketAddr(YarnConfiguration.RM_ADDRESS,
-            YarnConfiguration.DEFAULT_RM_ADDRESS,
-            YarnConfiguration.DEFAULT_RM_PORT);
+    if (HAUtil.isHAEnabled(conf)) {
+	  YarnConfiguration yarnConf = new YarnConfiguration(conf);
+	  if (yarnConf.get(YarnConfiguration.RM_HA_ID) == null) {
+	    String[] rmIds = yarnConf.getStrings(YarnConfiguration.RM_HA_IDS);
+	    if (rmIds != null && rmIds.length > 0) {
+	      // If RM_HA_ID is not configured, use the first one.
+	      // Because any valid RM HA ID should work.
+	      yarnConf.set(YarnConfiguration.RM_HA_ID, rmIds[0]);
+	    } else {
+	      LOG.warn("RM_HA_IDS is not configured when RM HA is enabled");
+	    }
+	  }
+	  return yarnConf.getSocketAddr(
+	      YarnConfiguration.RM_ADDRESS,
+	      YarnConfiguration.DEFAULT_RM_ADDRESS,
+	      YarnConfiguration.DEFAULT_RM_PORT);
+	  } else {
+	    return conf.getSocketAddr(
+	        YarnConfiguration.RM_ADDRESS,
+	        YarnConfiguration.DEFAULT_RM_ADDRESS,
+	        YarnConfiguration.DEFAULT_RM_PORT);
+	  }
   }
-
+  
   public static String getMasterPrincipal(Configuration conf)
       throws IOException {
     String masterHostname = getMasterAddress(conf).getHostName();
