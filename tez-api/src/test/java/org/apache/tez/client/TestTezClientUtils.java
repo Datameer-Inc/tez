@@ -699,5 +699,28 @@ public class TestTezClientUtils {
 
   }
 
+  @Test(timeout=5000)
+  public void testPathWithWhitespace() throws IOException {
+    FileSystem localFs = FileSystem.getLocal(new Configuration());
+
+    // Create test directory with whitespace in path name
+    Path testDir = new Path(TEST_ROOT_DIR, "path with whitespace");
+    if (localFs.exists(testDir)) {
+        localFs.delete(testDir, true);
+    }
+    localFs.mkdirs(testDir);
+
+    Path tarFile = new Path(testDir, "foo.tar.gz");
+    Assert.assertTrue(localFs.createNewFile(tarFile));
+
+    //tezLibUris.append(localFs.makeQualified(tarFile1).toString()).append("#tar1").append(",");
+
+    TezConfiguration conf = new TezConfiguration();
+    conf.set(TezConfiguration.TEZ_LIB_URIS, tarFile.toString());
+    Map<String,LocalResource> resources = new HashMap<String, LocalResource>();
+
+    Assert.assertTrue(
+    		TezClientUtils.setupTezJarsLocalResources(conf, new Credentials(), resources));
+  }
 
 }
