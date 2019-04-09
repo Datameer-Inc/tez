@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.security.PrivilegedExceptionAction;
 import java.util.ArrayList;
@@ -123,7 +125,7 @@ public class TezClientUtils {
       IOException {
     URI uri;
     try {
-      uri = new URI(fileName);
+      uri = new URI(URLEncoder.encode(fileName, "UTF8"));
     } catch (URISyntaxException e) {
       String message = "Invalid URI defined in configuration for"
           + " location of TEZ jars. providedURI=" + fileName;
@@ -131,7 +133,7 @@ public class TezClientUtils {
       throw new TezUncheckedException(message, e);
     }
 
-    Path p = new Path(uri);
+    Path p = new Path(URLDecoder.decode(uri.toString(), "UTF8"));
     FileSystem fs = p.getFileSystem(conf);
     p = fs.resolvePath(p.makeQualified(fs.getUri(),
         fs.getWorkingDirectory()));
