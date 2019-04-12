@@ -9,3 +9,4 @@
 .settings
 pom.xml.versionsBackup
 target
+protobuf-2.5.0

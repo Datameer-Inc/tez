@@ -23,6 +23,10 @@
      <version>0.8.5</version>
   </parent>
   <artifactId>hadoop-shim</artifactId>
+  <properties>
+  <maven.deploy.skip>true</maven.deploy.skip>
+</properties>
+  
 
   <dependencies>
     <dependency>

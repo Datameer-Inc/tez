@@ -21,14 +21,14 @@
   <parent>
     <groupId>org.apache.tez</groupId>
     <artifactId>tez</artifactId>
-    <version>0.8.5</version>
+    <version>0.8.5-dm3</version>
   </parent>
   <artifactId>tez-ui2</artifactId>
   <packaging>war</packaging>
 
   <properties>
     <webappDir>src/main/webapp</webappDir>
-    <node.executable>${basedir}/src/main/webapp/node/node</node.executable>
+    <node.executable>node</node.executable>
     <nodeVersion>v0.12.2</nodeVersion>
     <npmVersion>2.15.3</npmVersion>
     <skipTests>false</skipTests>
