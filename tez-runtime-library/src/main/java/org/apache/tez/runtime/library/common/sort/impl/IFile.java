@@ -821,8 +821,7 @@ public class IFile {
         decompressor = CodecPool.getDecompressor(codec);
         if (decompressor != null) {
           decompressor.reset();
-          in = CodecUtils.getDecompressedInputStreamWithBufferSize(codec, checksumIn, decompressor,
-              compressedLength);
+          in = codec.createInputStream(checksumIn, decompressor);
         } else {
           LOG.warn("Could not obtain decompressor from CodecPool");
           in = checksumIn;
